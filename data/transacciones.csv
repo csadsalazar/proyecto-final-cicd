@@ -1,4 +1,4 @@
-transaccion_id,fecha,cliente_id,producto,categoria,cantidad,precio_unitario,total,metodo_pago
+transaccion_id,fecha,cliente_id,producto,categoria_producto,cantidad,precio_unitario,total,metodo_pago
 T-0001,2026-06-14,C-153,Microfono,Audio,2.0,480.3,960.6,Efectivo
 T-0002,2026-06-11,C-143,Mouse,Accesorios,3.0,46.04,138.12,Tarjeta
 T-0003,2026-06-07,C-228,Laptop,Computo,1.0,2500.0,2500.0,Tarjeta
