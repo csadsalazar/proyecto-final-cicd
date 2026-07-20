@@ -123,15 +123,17 @@ Required test coverage of 85% reached. Total coverage: 100.00%
 
 ### Job Summary del CI
 
-> 📋 Pendiente: pegar aquí una captura del "Job Summary" de la pestaña
-> [Actions](https://github.com/csadsalazar/proyecto-final-cicd/actions)
-> tras un workflow ejecutado en GitHub (job `datos`).
+![Job Summary del job datos](docs/screenshots/job-summary.png)
 
 ### CI en ROJO y en VERDE
 
-> 📋 Pendiente: agregar capturas de pantalla de las dos ejecuciones de la
-> sección "Prueba de fuego" abajo (rojo y verde), tomadas de la pestaña
-> [Actions](https://github.com/csadsalazar/proyecto-final-cicd/actions).
+**Rojo** (rama `prueba-de-fuego`, [run 29771855557](https://github.com/csadsalazar/proyecto-final-cicd/actions/runs/29771855557)):
+
+![CI en rojo](docs/screenshots/ci-rojo.png)
+
+**Verde** (después del revert, [run 29772024609](https://github.com/csadsalazar/proyecto-final-cicd/actions/runs/29772024609)):
+
+![CI en verde](docs/screenshots/ci-verde.png)
 
 ## Prueba de fuego (mejora opcional, +3 pts)
 
