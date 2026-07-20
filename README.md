@@ -1,9 +1,6 @@
 # Proyecto Final — Pipeline de Transacciones de TiendaNova
 
-[![CI](https://github.com/TU-USUARIO/TU-REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/TU-USUARIO/TU-REPO/actions/workflows/ci.yml)
-
-> ⚠️ Reemplaza `TU-USUARIO/TU-REPO` en el badge de arriba por tu usuario y
-> nombre de repositorio reales una vez publicado en GitHub.
+[![CI](https://github.com/csadsalazar/proyecto-final-cicd/actions/workflows/ci.yml/badge.svg)](https://github.com/csadsalazar/proyecto-final-cicd/actions/workflows/ci.yml)
 
 Proyecto final del curso **CI/CD para Workflows de Datos con Python** (BSG
 Institute). Pipeline que toma el registro de transacciones de junio de 2026
