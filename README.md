@@ -15,7 +15,8 @@ kit_inicio/
 ├── data/transacciones.csv       <- dataset de entrada (100 filas, no se edita a mano)
 ├── src/
 │   ├── transform.py             <- limpieza + ingresos_por_categoria(df)
-│   └── validate.py              <- validar_entrada(df) + separar_validas(df)
+│   ├── validate.py              <- validar_entrada(df) + separar_validas(df)
+│   └── pandera_schema.py        <- contrato equivalente en pandera.DataFrameSchema
 ├── run_pipeline.py               <- CLI: --input, --output, --max-rechazo
 ├── tests/
 │   ├── test_transform.py
@@ -70,8 +71,46 @@ flake8 src tests run_pipeline.py --max-line-length=100
   (por defecto `0.15`), el pipeline termina con **exit 2**. Con el dataset
   entregado la tasa es 0.10, así que el pipeline pasa.
 - **Checks de datos** (`tests/data_checks/`, marker `datos`): columnas
-  obligatorias presentes, volumen mínimo de filas y tasa de nulos bajo
-  umbral (parametrizado) para `producto`, `categoria` y `precio_unitario`.
+  obligatorias presentes, volumen mínimo de filas, tasa de nulos bajo
+  umbral (parametrizado) para `producto`, `categoria` y `precio_unitario`,
+  y el contrato de Pandera (ver abajo).
+
+## Pandera (mejora opcional, +3 pts)
+
+El mismo contrato de la sección 2.1 se declaró además como un
+`pandera.DataFrameSchema` en [`src/pandera_schema.py`](src/pandera_schema.py):
+tipos, `unique=True` en `transaccion_id`, regex para `transaccion_id`/`cliente_id`,
+`isin(...)` para `categoria` y `metodo_pago`, rangos (`Check.ge`, `Check.gt`,
+`Check.in_range`) para `cantidad`, `precio_unitario` y `fecha`, y un check a
+nivel de DataFrame para la consistencia `total = cantidad × precio_unitario`.
+
+`tests/data_checks/test_pandera_contrato.py` (marker `datos`) valida el
+dataset crudo con `TRANSACCIONES_SCHEMA.validate(df, lazy=True)`, que en vez
+de detenerse en la primera fila con error, recolecta **todas** las
+violaciones en un solo reporte (`SchemaErrors.failure_cases`).
+
+### Cuadro de violaciones sobre el dataset crudo (`data/transacciones.csv`)
+
+| Regla violada | Transacciones afectadas | Filas |
+|---|---|---|
+| Unicidad de `transaccion_id` | T-0005, T-0005, T-0016, T-0016 | 4 |
+| `cantidad >= 1` | T-0042, T-0074 | 2 |
+| `precio_unitario` no nulo | T-0053, T-0089 | 2 |
+| `total = cantidad × precio_unitario` | T-0034, T-0059 | 2 |
+| `metodo_pago` en {Tarjeta, Efectivo, Billetera} | T-0062 | 1 |
+| `fecha` en rango [2026-06-01, 2026-06-30] | T-0096 | 1 |
+| **Total de filas distintas con ≥1 violación** | | **12** |
+
+**Nota sobre la diferencia con la cuarentena (10 vs. 12 filas):** el check
+`unique=True` de Pandera es genérico y marca **las dos** filas de cada
+`transaccion_id` repetido (4 filas para 2 IDs duplicados), porque no sabe
+cuál de las dos ocurrencias es "la correcta". Nuestra cuarentena
+(`separar_validas`), en cambio, toma la decisión de negocio de conservar la
+**primera ocurrencia** como válida y rechazar solo la repetición (2 filas).
+Por eso el pipeline reporta 10 rechazadas y el cuadro de Pandera reporta 12
+filas con violaciones — ambos números son correctos, solo responden
+preguntas distintas ("¿qué filas violan una regla genérica?" vs. "¿qué
+filas debo descartar del reporte final?").
 
 ## Evidencias
 
