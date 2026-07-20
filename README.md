@@ -124,14 +124,51 @@ Required test coverage of 85% reached. Total coverage: 100.00%
 ### Job Summary del CI
 
 > 📋 Pendiente: pegar aquí una captura del "Job Summary" de la pestaña
-> Actions tras el primer workflow ejecutado en GitHub (job `datos`).
+> [Actions](https://github.com/csadsalazar/proyecto-final-cicd/actions)
+> tras un workflow ejecutado en GitHub (job `datos`).
 
 ### CI en ROJO y en VERDE
 
-> 📋 Pendiente: agregar dos capturas de la pestaña Actions — una ejecución
-> en rojo (de cualquier fallo real durante el desarrollo, o de la prueba de
-> fuego) y una en verde, demostrando que el semáforo del CI funciona en
-> ambos sentidos.
+> 📋 Pendiente: agregar capturas de pantalla de las dos ejecuciones de la
+> sección "Prueba de fuego" abajo (rojo y verde), tomadas de la pestaña
+> [Actions](https://github.com/csadsalazar/proyecto-final-cicd/actions).
+
+## Prueba de fuego (mejora opcional, +3 pts)
+
+Para demostrar que el pipeline y el CI detectan datos corruptos "en el
+mundo real", se corrió el siguiente ciclo en la rama
+[`prueba-de-fuego`](https://github.com/csadsalazar/proyecto-final-cicd/tree/prueba-de-fuego)
+(la rama `main` nunca se tocó):
+
+1. **Corromper el esquema**: se renombró la columna `categoria` a
+   `categoria_producto` en `data/transacciones.csv`
+   ([commit `fe2a70f`](https://github.com/csadsalazar/proyecto-final-cicd/commit/fe2a70f)).
+2. **🔴 Rojo**: al ejecutar localmente
+   `python run_pipeline.py --input data/transacciones.csv --output output/ingresos_categoria.csv`
+   el pipeline terminó con:
+
+   ```
+   ERROR de contrato de entrada: Contrato de entrada violado, faltan columnas: ['categoria']
+   EXIT CODE: 1
+   ```
+
+   El CI también quedó en rojo en el mismo commit — falló el job `datos`,
+   concretamente el check genérico `test_columnas_obligatorias_presentes`
+   de `tests/data_checks/`, deteniendo el pipeline antes de publicar nada:
+   [ejecución fallida (run 29771855557)](https://github.com/csadsalazar/proyecto-final-cicd/actions/runs/29771855557).
+3. **Diagnóstico**: el mensaje de error señala exactamente la causa —
+   columna `categoria` ausente del contrato — sin necesidad de revisar
+   fila por fila.
+4. **Revert**: se restauró el nombre original de la columna
+   ([commit `a97d43f`](https://github.com/csadsalazar/proyecto-final-cicd/commit/a97d43f)).
+5. **🟢 Verde**: con el esquema restaurado, el CI volvió a pasar en los tres
+   jobs: [ejecución exitosa (run 29772024609)](https://github.com/csadsalazar/proyecto-final-cicd/actions/runs/29772024609).
+
+Este ciclo confirma que el contrato de entrada (`validar_entrada`) y los
+checks de datos actúan como una red de seguridad genérica: cualquier
+cambio de esquema del proveedor —no solo los 10 problemas sembrados en
+este dataset— detiene el pipeline con un mensaje claro en vez de publicar
+un reporte silenciosamente incorrecto.
 
 ## Preguntas de reflexión
 
